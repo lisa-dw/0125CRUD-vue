@@ -3,24 +3,28 @@
 
     <div>
 
-        <div> {{forum.user_id}}</div>
-        <input type="text" v-model="forum.id" /> <br />
         <input type="text" v-model="forum.title" /> <br />
-        <input type="text" v-model="forum.content" id="contents"/> <br />
+        <input type="text" v-model="forum.contents" id="contents"/> <br />
 
     </div>
 
     <div>
+
     <button @click="createforum">글쓰기</button>
+    <button @click="updateforum">수정</button> <br />
+
+    <input type="text" v-model="forumId" />
     <button @click="deleteforum">삭제</button>
-    <button @click="updateforum">수정</button>
+
+
+
 
       <div>
-        <button @click="readforum">글 읽어오기</button>
+        <button @click="readforums">글 읽어오기</button>
 
         <!--      {{ items }}-->
         <div v-for="forum in forums" :key="forum.id" :item="forum">
-          {{ forum.user_id }} || {{ forum.title }} || {{ forum.content }}
+          {{ forum.id }} || {{ forum.title }} || {{ forum.contents }}
         </div>
 
       </div>
@@ -36,7 +40,7 @@
 <script>
 import axios from 'axios'
 
-const URL_forum = 'http://localhost:8000/api/forums'
+const URL_forum = 'http://localhost:8001/api/forums'
 
 export default {
   name: 'App',
@@ -48,12 +52,12 @@ export default {
         id: 0,         //글 번호
         user_id:'',    //유저 아이디
         title:'',      // 제목
-        content:'',    // 글내용
+        contents:'',    // 글내용
 
         },
 
       forumId: 0,
-      forums: [],     // 글 전체
+      forums: [],     // 글 전체 -> 배열상태 -> <template>에서 포문을 돌려서 요소 하나하나를 꺼내줌.
 
     }
   },
@@ -63,16 +67,24 @@ export default {
     async createforum() {
       const res = await axios.post(URL_forum, { ...this.forum })  //forum 전체를 post 한다는 의미.
       console.log(res)
+      console.log(res.data)
+      this.forums.push(res.data)  //forums라는 배열의 맨 뒤에 res.data를 바로 집어넣어라
+                          // 브라우저에 출력 되어있는 forums에 res.data를 바로 push해서, 브라우저에서 보여준다.
+
+
+      //await this.readforums()
     },
 
     async deleteforum() {
       const res = await axios.delete(URL_forum + '/' + this.forumId)
-      console.log(res.data)
+      console.log(res)
+
+      await this.readforums()   //  삭제 후에 바로 readforums 함수를 실행시켜, 브라우저 화면에
     },
 
-    async readforum() {
+    async readforums() {
       const res = await axios.get(URL_forum)
-      this.items = res.data
+      this.forums = res.data  // this.forums 의 forums 가 data(): 의 forums 이고, 이 forums는 배열[] 이므로
       console.log(res)
     },
 
@@ -84,14 +96,14 @@ export default {
 
 
 
-  watch: {
-    'forum': {
-      deep: true,
-      handler() {
-        console.log('watch', this.forum)
-      },
-    },
-  },
+  // watch: {
+  //   'forum': {
+  //     deep: true,
+  //     handler() {
+  //       console.log('watch', this.forum)
+  //     },
+  //   },
+  // },
 }
 </script>
 
@@ -114,6 +126,5 @@ input#contents {
   height: 500px;
 
 }
-
 
 </style>
