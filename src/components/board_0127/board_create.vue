@@ -1,43 +1,27 @@
 <template>
   <div id="app">
 
-    <!---->
+    <div>
 
-    <div> <!--제목 / 작성자 / 작성시간-->
-
-
-
-    </div>
-
-
-
-    <div> <!--내용-->
-
-
+        <input type="text" v-model="forum.title" /> <br />
+        <input type="text" v-model="forum.contents" id="contents"/> <br />
 
     </div>
-
-
-
-
-    <div> <!-- 버튼 : 수정 / 삭제 / 목록으로 -->
-
-
-    <input type="text" v-model="forumId" />
-
-      <button @click="updateforum">수정</button>
-      <button @click="deleteforum">삭제</button>
-      <button @click="readforums">목록</button>
-
-    </div>
-
-    {{ this.forum }}
 
     <div>
 
+    <button @click="createforum">글쓰기</button>
+    <button @click="updateforum">수정</button> <br />
 
-        <button @click="readforum">글 읽어오기</button>
+    <input type="text" v-model="forumId" />
+    <button @click="deleteforum">삭제</button>
+
+
+
+
       <div>
+        <button @click="readforums">글 읽어오기</button>
+
         <!--      {{ items }}-->
         <div v-for="forum in forums" :key="forum.id" :item="forum">
 
@@ -47,15 +31,10 @@
                     {{ forum.id }}
                   </td>
                   <td>
-                    <a href="javascript:">
-                      {{ forum.title }}
-                    </a>
+                    {{ forum.title }}
                   </td>
                   <td>
                     {{ forum.contents }}
-                  </td>
-                  <td>
-                    {{ forum.user.name }}
                   </td>
                 </tr>
             </table>
@@ -77,7 +56,7 @@
 <script>
 import axios from 'axios'
 
-const URL_forum = 'http://localhost:8000/api/forums'
+const URL_forum = 'http://localhost:8001/api/forums'
 
 export default {
   name: 'App',
@@ -87,11 +66,9 @@ export default {
       forum: {
 
         id: 0,         //글 번호
-        $user_id:'',    //유저 아이디
+        user_id:'',    //유저 아이디
         title:'',      // 제목
         contents:'',    // 글내용
-
-
 
         },
 
@@ -119,15 +96,6 @@ export default {
       console.log(res)
 
       await this.readforums()   //  삭제 후에 바로 readforums 함수를 실행시켜, 브라우저 화면에
-    },
-
-    async readforum() {
-
-      console.log(this.forumId)
-
-      const res = await axios.get(URL_forum + '/' + this.forumId)
-      this.forum = res.data  // this.forums 의 forums 가 data(): 의 forums 이고, 이 forums는 배열[] 이므로
-      console.log(res)
     },
 
     async readforums() {
